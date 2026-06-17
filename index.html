@@ -32,6 +32,13 @@
             font-style: normal;
             font-display: swap;
         }
+        @font-face {
+            font-family: 'tank-lite';
+            src: url('./font/tank-lite-italic.ttf');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
 
         html, body {
             height: 100%;
@@ -128,12 +135,25 @@
             font-size: 60px;
         }
 
-        #home-team-wrapper {
+        #home-team-wrapper, #countdown-home {
             color: var(--red-color);
         }
 
-        #away-team-wrapper {
+        #away-team-wrapper, #countdown-away {
             color: var(--blue-color);
+        }
+
+        #countdown-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            font-size: 80px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            text-shadow: -1px 0px 16px rgba(0,0,0,0.75);
+        }
+        #days-left-text {
+            font-family: 'tank-lite';
         }
 
         /* --- Independent Positioning Media Queries --- */
@@ -144,12 +164,12 @@
                 /* Custom horizontal positioning for landscape */
                 position: absolute;
                 left: 19%;
-                top: 46%;
+                top: 46.5%;
             }
             #away-team-wrapper {
                 /* Custom horizontal positioning for landscape */
                 position: absolute;
-                right: 17%;
+                right: 16%;
                 top: 46%;
             }
             #time-wrapper {
@@ -171,6 +191,25 @@
             .time-text {
                 font-size: 16px;
             }
+            #countdown-container {
+                position: absolute;
+                top: -18%;
+                right: -15%;
+                font-size: 120px;
+            }
+            #countdown-home {
+                position: absolute;
+                top: 80%;
+                left: 40%;
+                font-size: 16px;
+            }
+            #countdown-away {
+                position: absolute;
+                top: 80%;
+                right: 22.2%;
+                font-size: 16px;
+                letter-spacing: 1px;
+            }
         }
 
         /* Example: Vertical Screen */
@@ -179,13 +218,13 @@
                 /* Custom vertical positioning for portrait */
                 position: absolute;
                 top: 56.5%;
-                left: 3%;
+                left: 0%;
             }
             #away-team-wrapper {
                 /* Custom vertical positioning for portrait */
                 position: absolute;
                 top: 56.5%;
-                right: -2%;
+                right: -5%;
             }
             #time-wrapper {
                 /* Custom vertical positioning for portrait */
@@ -208,6 +247,26 @@
             }
             .font-size-finalizado-vertical {
                 font-size: 15px;
+            }
+            #countdown-container {
+                position: absolute;
+                top: 9%;
+                left: -11%;
+                font-size: 100px;
+            }
+            #countdown-home {
+                position: absolute;
+                top: 66%;
+                right: 42.5%;
+                font-size: 18px;
+                letter-spacing: 0;
+            }
+            #countdown-away {
+                position: absolute;
+                top: 66.2%;
+                left: 64.5%;
+                font-size: 16px;
+                letter-spacing: 0;
             }
         }
     </style>
@@ -235,6 +294,12 @@
             <div id="away-score" class="score-number">00</div>
         </div>
     </div>
+    
+    <div id="countdown-container" class="layout-container">
+        <div id="days-left-text">00 DÍAS</div>
+        <div id="countdown-home" class="team-name">PORTUGAL</div>
+        <div id="countdown-away" class="team-name">UZBEKISTÁN</div>
+    </div>
 
     <!-- <button id="testGoalBtn" class="test-btn">🎯 TEST</button> -->
 </div>
@@ -243,19 +308,44 @@
     /**
      * Logic for Screen Size and Image Selection:
      */
+    const TARGET_DATE = new Date('2026-06-23T12:00:00-05:00'); // prod
+    // const TARGET_DATE = new Date('2026-06-17T15:12:00-05:00'); // dev
+
+    function isGameStarted() {
+        // Force current time to be compared with the target UTC-5 date
+        const now = new Date();
+        const nowLima = new Date(now.toLocaleString("en-US", {timeZone: "America/Lima"}));
+        return nowLima >= TARGET_DATE;
+    }
+
+    function updateCountdownDisplay() {
+        if (!isGameStarted()) {
+            const now = new Date();
+            const nowLima = new Date(now.toLocaleString("en-US", {timeZone: "America/Lima"}));
+            const diff = TARGET_DATE - nowLima;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('days-left-text').textContent = `${days > 0 ? days : 0}`;
+            document.getElementById('score-container').style.display = 'none';
+            document.getElementById('countdown-container').style.display = 'flex';
+        } else {
+            document.getElementById('score-container').style.display = 'flex';
+            document.getElementById('countdown-container').style.display = 'none';
+        }
+    }
+
     function updateBackground() {
         const bgImg = document.getElementById('background-img');
-        const params = new URLSearchParams(window.location.search);
         const width = window.innerWidth;
         const height = window.innerHeight;
         
+        const gameStarted = isGameStarted();
         let imgSrc = "";
-        // Default to vertical if height > width
+
         if (height > width) {
-            imgSrc = "./img/vertical/scoreboard.png";
+            imgSrc = gameStarted ? "./img/vertical/scoreboard.png" : "./img/vertical/countdown.png";
             bgImg.classList.add('vertical');
         } else {
-            imgSrc = "./img/horizontal/scoreboard.png";
+            imgSrc = gameStarted ? "./img/horizontal/scoreboard.png" : "./img/horizontal/countdown.png";
             bgImg.classList.remove('vertical');
         }
 
@@ -266,8 +356,9 @@
         }
     }
 
-    // Initialize background and listen for window size changes
+    // Initialize background and countdown once on load
     updateBackground();
+    updateCountdownDisplay();
     window.addEventListener('resize', updateBackground);
 
     const GAME_ID = "portugal_vs_congo";
@@ -304,8 +395,8 @@
 
     async function loadData() {
         try {
-            const res = await fetch("https://doradobet-server.onrender.com/data?gameId=16098411");
-            // const res = await fetch("http://localhost:9009/data?gameId=16098411");
+            const res = await fetch("https://doradobet-server.onrender.com/data?gameId=16120099"); // prod
+            // const res = await fetch("http://localhost:9009/data?gameId=16120099"); // dev
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             
             const data = await res.json();
@@ -349,7 +440,7 @@
     }
 
     loadData();
-    setInterval(loadData, 1000);
+    setInterval(loadData, 1000); // prod
 </script>
 </body>
 </html>
