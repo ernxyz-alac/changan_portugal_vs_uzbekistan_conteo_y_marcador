@@ -212,19 +212,19 @@
             }
         }
 
-        /* Example: Vertical Screen */
-        @media (orientation: portrait) {
+        /* 510x450 Special Handling */
+        @media screen and (width: 510px) and (height: 450px) {
             #home-team-wrapper {
                 /* Custom vertical positioning for portrait */
                 position: absolute;
                 top: 56.5%;
-                left: 0%;
+                left: 4%;
             }
             #away-team-wrapper {
                 /* Custom vertical positioning for portrait */
                 position: absolute;
                 top: 56.5%;
-                right: -5%;
+                right: -2%;
             }
             #time-wrapper {
                 /* Custom vertical positioning for portrait */
@@ -235,7 +235,7 @@
             .score-number {
                 font-size: 75px;
                 font-weight: bold;
-                margin-top: -5px;
+                margin-top: -10px;
             }
 
             .team-name {
@@ -251,22 +251,22 @@
             #countdown-container {
                 position: absolute;
                 top: 9%;
-                left: -11%;
-                font-size: 100px;
+                left: -10%;
+                font-size: 80px;
             }
             #countdown-home {
                 position: absolute;
-                top: 66%;
-                right: 42.5%;
+                top: 65.5%;
+                left: 31.5%;
                 font-size: 18px;
-                letter-spacing: 0;
+                letter-spacing: 2px;
             }
             #countdown-away {
                 position: absolute;
                 top: 66.2%;
-                left: 64.5%;
+                left: 63.5%;
                 font-size: 16px;
-                letter-spacing: 0;
+                letter-spacing: 1.5px;
             }
         }
     </style>
@@ -309,7 +309,7 @@
      * Logic for Screen Size and Image Selection:
      */
     const TARGET_DATE = new Date('2026-06-23T12:00:00-05:00'); // prod
-    // const TARGET_DATE = new Date('2026-06-17T15:12:00-05:00'); // dev
+    // const TARGET_DATE = new Date('2026-06-19T15:12:00-05:00'); // dev
 
     function isGameStarted() {
         // Force current time to be compared with the target UTC-5 date
@@ -347,7 +347,7 @@
         const gameStarted = isGameStarted();
         let imgSrc = "";
 
-        if (height > width) {
+        if (height > width || (width === 510 && height === 450)) {
             imgSrc = gameStarted ? "./img/vertical/scoreboard.png" : "./img/vertical/countdown.png";
             bgImg.classList.add('vertical');
         } else {
