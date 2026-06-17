@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Portugal vs Congo</title>
+    <title>Portugal vs Uzbekistan</title>
     <style>
 
         :root {
@@ -231,7 +231,7 @@
 
         <!-- Away Team Component -->
         <div id="away-team-wrapper" class="team-wrapper">
-            <div id="away-name" class="team-name">RD CONGO</div>
+            <div id="away-name" class="team-name">UZBEKISTÁN</div>
             <div id="away-score" class="score-number">00</div>
         </div>
     </div>
@@ -246,8 +246,8 @@
     function updateBackground() {
         const bgImg = document.getElementById('background-img');
         const params = new URLSearchParams(window.location.search);
-        const width = parseInt(params.get('width')) || window.innerWidth;
-        const height = parseInt(params.get('height')) || window.innerHeight;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
         
         let imgSrc = "";
         // Default to vertical if height > width
