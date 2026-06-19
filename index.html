@@ -156,6 +156,13 @@
             font-family: 'tank-lite';
         }
 
+        #logo {
+            position: absolute;
+            right: 0px;
+            bottom: 0px;
+            z-index: 5;
+        }
+
         /* --- Independent Positioning Media Queries --- */
 
         /* Example: Horizontal Screen */
@@ -209,6 +216,9 @@
                 right: 22.2%;
                 font-size: 16px;
                 letter-spacing: 1px;
+            }
+            #logo {
+                width: 20%;
             }
         }
 
@@ -268,6 +278,24 @@
                 font-size: 16px;
                 letter-spacing: 1.5px;
             }
+            .today-vertical-positioning {                
+                #countdown-home {
+                    position: absolute;
+                    top: 61%;
+                    left: 34%;
+                    font-size: 16px;
+                }
+                #countdown-away {
+                    position: absolute;
+                    top: 61%;
+                    left: 63.2%;
+                    font-size: 16px;
+                    letter-spacing: 0;
+                }
+            }
+            #logo {
+                width: 30%;
+            }
         }
     </style>
 </head>
@@ -301,6 +329,8 @@
         <div id="countdown-away" class="team-name">UZBEKISTÁN</div>
     </div>
 
+    <img src="./img/logo.png" id="logo" alt="Logo Changan" />
+
     <!-- <button id="testGoalBtn" class="test-btn">🎯 TEST</button> -->
 </div>
 
@@ -309,7 +339,7 @@
      * Logic for Screen Size and Image Selection:
      */
     const TARGET_DATE = new Date('2026-06-23T12:00:00-05:00'); // prod
-    // const TARGET_DATE = new Date('2026-06-19T15:12:00-05:00'); // dev
+    // const TARGET_DATE = new Date('2026-06-22T15:30:00-05:00'); // dev
 
     function isGameStarted() {
         // Force current time to be compared with the target UTC-5 date
@@ -318,6 +348,7 @@
         return nowLima >= TARGET_DATE;
     }
 
+    let isMatchToday = false
     function updateCountdownDisplay() {
         if (!isGameStarted()) {
             const now = new Date();
@@ -329,6 +360,12 @@
 
             const diff = targetMidnight - nowMidnight;
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (days == 0) {
+                isMatchToday = true
+                document.getElementById('days-left-text').style.display = 'none'
+                document.getElementById('countdown-container').classList.add('today-vertical-positioning')
+            }
 
             document.getElementById('days-left-text').textContent = `${days >= 0 ? days : 0}`;
             document.getElementById('score-container').style.display = 'none';
@@ -348,10 +385,18 @@
         let imgSrc = "";
 
         if (height > width || (width === 510 && height === 450)) {
-            imgSrc = gameStarted ? "./img/vertical/scoreboard.png" : "./img/vertical/countdown.png";
+            imgSrc = gameStarted 
+                ? "./img/vertical/scoreboard.png" 
+                : isMatchToday
+                    ? "./img/vertical/today.png"
+                    : "./img/vertical/countdown.png"
             bgImg.classList.add('vertical');
         } else {
-            imgSrc = gameStarted ? "./img/horizontal/scoreboard.png" : "./img/horizontal/countdown.png";
+            imgSrc = gameStarted 
+                ? "./img/horizontal/scoreboard.png" 
+                : isMatchToday
+                    ? "./img/horizontal/today.png"
+                    : "./img/horizontal/countdown.png"
             bgImg.classList.remove('vertical');
         }
 
@@ -363,8 +408,8 @@
     }
 
     // Initialize background and countdown once on load
-    updateBackground();
     updateCountdownDisplay();
+    updateBackground();
     window.addEventListener('resize', updateBackground);
 
     const GAME_ID = "portugal_vs_uzbekistan";
