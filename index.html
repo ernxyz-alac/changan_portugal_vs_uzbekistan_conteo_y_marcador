@@ -344,8 +344,7 @@
     function isGameStarted() {
         // Force current time to be compared with the target UTC-5 date
         const now = new Date();
-        const nowLima = new Date(now.toLocaleString("en-US", {timeZone: "America/Lima"}));
-        return nowLima >= TARGET_DATE;
+        return now >= TARGET_DATE;
     }
 
     let isMatchToday = false
